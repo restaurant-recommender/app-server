@@ -6,7 +6,10 @@
     "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
     "build": "tsc",
     "prestart": "yarn build",
-    "dev": "tsc && nodemon ./dist/server.js"
+    "dev": "tsc && nodemon ./dist/server.js",
+    "gcp-build": "tsc -p .",
+    "start": "node ./dist/server.js",
+    "deploy": "gcloud app deploy"
   },
   "license": "MIT",
   "dependencies": {
