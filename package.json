@@ -3,8 +3,6 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
-    "prestart": "yarn build",
     "dev": "tsc && nodemon ./dist/server.js",
     "gcp-build": "tsc -p .",
     "start": "node ./dist/server.js",
@@ -12,12 +10,14 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@types/cors": "^2.8.7",
+    "@types/cors": "^2.8.8",
     "@types/express": "^4.17.8",
+    "@types/jsonwebtoken": "^8.5.0",
     "@types/mongoose": "^5.7.36",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.10.7"
   },
   "devDependencies": {
