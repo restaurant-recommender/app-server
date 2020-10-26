@@ -5,6 +5,7 @@ const schema = new mongoose.Schema({
     name_en: String,
     ref_id: String,
     is_visible: Boolean,
+    is_common: Boolean,
     is_active: {
         type: Boolean,
         default: true,
