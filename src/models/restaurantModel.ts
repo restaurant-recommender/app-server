@@ -1,4 +1,4 @@
-import mongoose, { mongo } from 'mongoose'
+import mongoose from 'mongoose'
 
 var openHoursSchema = new mongoose.Schema({
     key: String,

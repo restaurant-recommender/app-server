@@ -1,5 +1,4 @@
-import mongoose from "mongoose"
-import { restaurantSchema } from "./restaurantModel"
+import mongoose from 'mongoose'
 
 const schema = new mongoose.Schema({
     username: String,
@@ -30,4 +29,4 @@ const schema = new mongoose.Schema({
 })
 
 export const userSchema = schema
-export default mongoose.model("users", schema)
+export default mongoose.model('users', schema)

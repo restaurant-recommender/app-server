@@ -1,14 +1,13 @@
-import { Request, Response } from "express"
-import { Document } from "mongoose"
-import Restaurant from "../models/restaurantModel"
-import Recommenation from "../models/recommendationModel"
+import { Request, Response } from 'express'
+import { Document } from 'mongoose'
+import Restaurant from '../models/restaurantModel'
+import Recommenation from '../models/recommendationModel'
 import mongoose from 'mongoose'
-
 
 const batchSize: Number = 20
 
 const nearbyRecommender = (res: Response, token: String): void => {
-    console.log("in rec")
+    console.log('in rec')
     Recommenation.findById(token, (err, recommendation) => {
         if (err) {
             res.status(500).send(err)
@@ -20,10 +19,10 @@ const nearbyRecommender = (res: Response, token: String): void => {
                 {
                     $geoNear: {
                         near: {
-                            type: "Point",
+                            type: 'Point',
                             coordinates: coordinates
                         },
-                        distanceField: "dist.calculated",
+                        distanceField: 'dist.calculated',
                         spherical: true
                     }
                 },
@@ -103,52 +102,54 @@ const completeRecommendation = (res: Response, token: String, requestData: Compl
     )
 }
 
-export const requestRecommendation = (req: Request, res: Response) => {
-    const body = req.body
-    if ('token' in body) {
-        if ('histories' in body) {
-            console.log('in update')
-            updateRecommendation(res, body.token, body.histories)
-        }
-        if (req.query.completed === "1") {
-            if (!('completed_at' in body)) {
-                res.status(400).send('completed_at is required for recommendation complation')
+export const recommendationController = {
+    requestRecommendation: (req: Request, res: Response) => {
+        const body = req.body
+        if ('token' in body) {
+            if ('histories' in body) {
+                console.log('in update')
+                updateRecommendation(res, body.token, body.histories)
             }
-            completeRecommendation(res, body.token, {
-                rating: 'rating' in body ? body.rating : -1,
-                completed_at: body.completed_at,
-            })
-        } else {
-            nearbyRecommender(res, body.token)
-        }
-    } else {
-        if (!('users' in body) || !('location' in body)) {
-            res.status(400).send('User ids and location are needed for recommendation initialzation')
-        } else {
-            initializeRecommendation(body, (token: String) => {
-                if (token === '') {
-                    res.status(500).send('There was an error during recommendation initialization')
+            if (req.query.completed === '1') {
+                if (!('completed_at' in body)) {
+                    res.status(400).send('completed_at is required for recommendation complation')
                 }
-                nearbyRecommender(res, token)
-            })
+                completeRecommendation(res, body.token, {
+                    rating: 'rating' in body ? body.rating : -1,
+                    completed_at: body.completed_at,
+                })
+            } else {
+                nearbyRecommender(res, body.token)
+            }
+        } else {
+            if (!('users' in body) || !('location' in body)) {
+                res.status(400).send('User ids and location are needed for recommendation initialzation')
+            } else {
+                initializeRecommendation(body, (token: String) => {
+                    if (token === '') {
+                        res.status(500).send('There was an error during recommendation initialization')
+                    }
+                    nearbyRecommender(res, token)
+                })
+            }
         }
+    },
+
+    getAllRecommendations: (_: Request, res: Response): void => {
+        Recommenation.find({ is_active: true }, (err: any, user: Document) => {
+            if (err) {
+                res.send(err)
+            }
+            res.json(user)
+        })
+    },
+
+    getRecommendation: (req: Request, res: Response): void => {
+        Recommenation.findById(req.params.id, (err: any, user: Document) => {
+            if (err) {
+                res.send(err)
+            }
+            res.json(user)
+        })
     }
-}
-
-export const getAllRecommendations = (_: Request, res: Response): void => {
-    Recommenation.find({ is_active: true }, (err: any, user: Document) => {
-        if (err) {
-            res.send(err)
-        }
-        res.json(user)
-    })
-}
-
-export const getRecommendation = (req: Request, res: Response): void => {
-    Recommenation.findById(req.params.id, (err: any, user: Document) => {
-        if (err) {
-            res.send(err)
-        }
-        res.json(user)
-    })
 }

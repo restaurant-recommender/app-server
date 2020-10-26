@@ -1,0 +1,5 @@
+export { authenticationController } from './authenticationController'
+export { categoryController } from './categoryController'
+export { recommendationController } from './recommendationController'
+export { restaurnatController } from './restaurantController'
+export { userController } from './userController'

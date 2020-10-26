@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose from 'mongoose'
 
 const schema = new mongoose.Schema({
     name_th: String,
@@ -12,4 +12,4 @@ const schema = new mongoose.Schema({
 })
 
 export const categorySchema = schema
-export default mongoose.model("categories", schema)
+export default mongoose.model('categories', schema)

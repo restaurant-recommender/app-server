@@ -1,5 +1,5 @@
-import mongoose from "mongoose"
-import { pointSchema } from "./restaurantModel"
+import mongoose from 'mongoose'
+import { pointSchema } from './restaurantModel'
 
 const historySchema = new mongoose.Schema({
     restaurant: {
@@ -27,4 +27,4 @@ const schema = new mongoose.Schema({
 })
 
 export const recommendationSchema = schema
-export default mongoose.model("recommendations", schema)
+export default mongoose.model('recommendations', schema)

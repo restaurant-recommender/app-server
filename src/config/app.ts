@@ -1,9 +1,9 @@
-import express from "express"
-import bodyParser from "body-parser"
-import mongoose from "mongoose"
-import cors from "cors"
-import router from "./routes"
-import env from "./environments"
+import express from 'express'
+import bodyParser from 'body-parser'
+import mongoose from 'mongoose'
+import cors from 'cors'
+import router from './routes'
+import env from './environments'
 
 const app = express()
 
@@ -19,6 +19,6 @@ mongoose.connect(env.mongoURL, {
 })
 
 // routes
-app.use("/", router)
+app.use('/', router)
 
 export default app
