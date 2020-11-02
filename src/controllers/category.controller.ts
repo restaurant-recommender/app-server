@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { Document } from 'mongoose'
-import Category from '../models/categoryModel'
+import Category from '../models/category.model'
 
 export const categoryController = {
     update: (req: Request, res: Response): void => {

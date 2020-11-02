@@ -1,5 +1,24 @@
 import mongoose from 'mongoose'
-import { pointSchema } from './restaurantModel'
+import { pointSchema, restaurantInterface, pointInterface } from './restaurant.model'
+import { userInterface } from './user.model'
+
+export interface HistoryInterface {
+    restaurant: string | restaurantInterface
+    is_love: boolean
+    timestamp: Date
+}
+
+export interface recommendationInterface {
+    _id: string
+    histories: HistoryInterface[]
+    users: string[] | userInterface[]
+    location: pointInterface
+    created_at: Date
+    completed_at: Date
+    rating: number
+    is_complete: boolean
+    is_active: boolean
+}
 
 const historySchema = new mongoose.Schema({
     restaurant: {
@@ -20,6 +39,10 @@ const schema = new mongoose.Schema({
     created_at: Date,
     completed_at: Date,
     rating: Number,
+    is_complete: {
+        type: Boolean,
+        default: false,
+    },
     is_active: {
         type: Boolean,
         default: true,

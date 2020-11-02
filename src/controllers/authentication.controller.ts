@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import env from '../config/environments'
-import User from '../models/userModel'
+import User from '../models/user.model'
 import jwt from 'jsonwebtoken'
 
 const generateToken = (username: String): String => {

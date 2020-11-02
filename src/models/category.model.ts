@@ -1,5 +1,14 @@
 import mongoose from 'mongoose'
 
+export interface categoryInterface {
+    name_th: string
+    name_en: string
+    ref_id: string
+    is_visible: boolean
+    is_common: boolean
+    is_active: boolean
+}
+
 const schema = new mongoose.Schema({
     name_th: String,
     name_en: String,

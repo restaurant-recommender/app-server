@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { Document } from 'mongoose'
-import User from '../models/userModel'
+import User from '../models/user.model'
 import mongoose from 'mongoose'
 
 export const userController = {

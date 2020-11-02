@@ -17,6 +17,7 @@ mongoose.connect(env.mongoURL, {
     useNewUrlParser: true,
     useUnifiedTopology: true 
 })
+mongoose.set('useCreateIndex', true)
 
 // routes
 app.use('/', router)

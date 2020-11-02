@@ -1,4 +1,21 @@
 import mongoose from 'mongoose'
+import { categoryInterface } from './category.model'
+import { recommendationInterface } from './recommendation.model'
+
+export interface userInterface {
+    username: string
+    profile: {
+        gender: 'male' | 'female'
+        birthdate: Date
+        preference: {
+            categories: string[] | categoryInterface[]
+            price_range: number
+            prefer_nearby: boolean
+        }
+    }
+    recommendation_histories: string[] | recommendationInterface[]
+    is_active: boolean
+}
 
 const schema = new mongoose.Schema({
     username: String,
@@ -18,7 +35,7 @@ const schema = new mongoose.Schema({
             },
         }
     },
-    behavior: [{
+    recommendation_histories: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'recommendations',
     }],
