@@ -1,18 +1,19 @@
 import mongoose from 'mongoose'
-import { pointSchema, restaurantInterface, pointInterface } from './restaurant.model'
-import { userInterface } from './user.model'
+import { pointSchema, IRestaurant, IPoint } from './restaurant.model'
+import { IUser } from './user.model'
 
-export interface HistoryInterface {
-    restaurant: string | restaurantInterface
+export interface IHistory {
+    restaurant: string | IRestaurant
     is_love: boolean
+    rating: number
     timestamp: Date
 }
 
-export interface recommendationInterface {
+export interface IRecommendation {
     _id: string
-    histories: HistoryInterface[]
-    users: string[] | userInterface[]
-    location: pointInterface
+    histories: IHistory[]
+    users: string[] | IUser[]
+    location: IPoint
     created_at: Date
     completed_at: Date
     rating: number
@@ -26,6 +27,7 @@ const historySchema = new mongoose.Schema({
         ref: 'restuarants'
     },
     is_love: Boolean,
+    rating: Number,
     timestamp: Date,
 })
 

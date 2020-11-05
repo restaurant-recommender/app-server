@@ -1,28 +1,31 @@
 import mongoose from 'mongoose'
-import { categoryInterface } from './category.model'
+import { ICategory } from './category.model'
 
-export interface restaurantInterface {
-    _id: string
+export interface IRestaurant {
+    _id?: string
     name: string
-    profile: {
-        categories: [string?] | [categoryInterface?]
+    has_profile: boolean
+    profile?: {
+        categories: string[] | ICategory[]
         price_range: number
         rating: number
         likes: number
     }
-    address: string
-    location: pointInterface
-    open_hours: [{
+    address?: string
+    location: IPoint
+    open_hours?: [{
         key: string
         value: string
-    }],
-    phone_no: string
-    cover_url: string
+    }] | any,
+    phone_no?: string
+    cover_url?: string
+    ref: string
     ref_id: string
-    is_active: boolean
+    link: string
+    is_active?: boolean
 }
 
-export interface pointInterface {
+export interface IPoint {
     type: string
     coordinates: [number, number]
 }
@@ -46,6 +49,7 @@ export const pointSchema = new mongoose.Schema({
 
 const schema = new mongoose.Schema({
     name: String,
+    has_profile: Boolean,
     profile: {
         type: {
             categories: [{
@@ -62,7 +66,9 @@ const schema = new mongoose.Schema({
     open_hours: [openHoursSchema],
     phone_no: String,
     cover_url: String,
+    ref: String,
     ref_id: String,
+    link: String,
     is_active: {
         type: Boolean,
         default: true,

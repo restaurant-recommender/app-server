@@ -1,13 +1,17 @@
-import Recommendation, { recommendationInterface } from '../models/recommendation.model'
+import Recommendation, { IRecommendation } from '../models/recommendation.model'
 import Restaurant from '../models/restaurant.model'
 import User from '../models/user.model'
 import { InitialRequest, UpdateRequest } from '../controllers/recommendation.controller'
 import mongoose, { Document } from 'mongoose'
 import axios from 'axios'
 import env from '../config/environments'
+import { restaurantService } from './restaurant.service'
 
 export const recommendationService = {
     initializeRecommendation: async (initialRequest: InitialRequest): Promise<void | Document> => {
+
+        restaurantService.fetchNearby(initialRequest.location.coordinates[1], initialRequest.location.coordinates[0])
+
         let userIds: [any?] = []
         initialRequest.users.forEach((userId: string) => {
             userIds.push(mongoose.Types.ObjectId(userId))
@@ -20,7 +24,7 @@ export const recommendationService = {
         })
 
         return recommendation.save().then((result) => {
-            const recommendation: recommendationInterface = result.toObject()
+            const recommendation: IRecommendation = result.toObject()
             recommendation.users.forEach((userId: any) => {
                 User.findByIdAndUpdate(userId,
                     { $push: { recommendation_histories: mongoose.Types.ObjectId(recommendation._id) }}
@@ -30,12 +34,31 @@ export const recommendationService = {
         })
     },
 
-    getRecommendation: async (recommendation: recommendationInterface): Promise<Document[]>  => {
-        return axios.post(`${env.recommenderURL}/recommend/nearby`, recommendation).then((result) => {
+    getRecommendation: async (recommendation: IRecommendation): Promise<void | Document[]>  => {
+        return axios.post(`${env.recommenderURL}/recommend/simple`, recommendation).then((result) => {
             if (result.data.status) {
-                return Restaurant.find({
-                    _id: { $in: result.data.restaurant_ids.map((id: any) => mongoose.Types.ObjectId(id)) }
-                }).exec()
+                const ids: object[] = result.data.restaurant_ids.map((id: any) => mongoose.Types.ObjectId(id))
+                // return Restaurant.find({
+                //     _id: { $in: result.data.restaurant_ids.map((id: any) => mongoose.Types.ObjectId(id)) }
+                // }).populate({
+                //     path: 'profile.categories',
+                //     model: 'categories'
+                // }).then((documents: Document[]) => 
+                //     documents.sort((a, b) => ids.findIndex(id => a._id.equals(id) - ids.findIndex(id => b._id.equals(id) )))
+                // )
+                return Restaurant.aggregate([
+                    { $match: { _id: {$in: ids }}},
+                    { $addFields: {"__order": {$indexOfArray: [ ids, "$_id" ]}}},
+                    { $sort: {"__order": 1 }},
+                    { $lookup: { from: 'categories', localField: 'profile.categories', foreignField: '_id', as: 'profile.categories' }}
+                ]).exec()
+                
+                
+                
+
+            //     {$match: {name: {$in: order}}},
+            //  {$addFields: {"__order": {$indexOfArray: [order, "$name" ]}}},
+            //  {$sort: {"__order": 1}}
             } else {
                 throw('Recommendation system error!')
             }
@@ -46,7 +69,7 @@ export const recommendationService = {
         return Recommendation.findByIdAndUpdate(
             updateRequest.token,
             { $push: { histories: { $each: updateRequest.histories }}},
-            { upsert: true }
+            { new: true }
         ).exec()
     },
 
@@ -75,5 +98,41 @@ export const recommendationService = {
                 }
             }
         }]).exec()
+    },
+
+    getById: async (id: string) : Promise<Document> => {
+        return Recommendation.findById(id).populate([{
+            path: 'histories.restaurant',
+            model: 'restaurants',
+            populate: {
+                path: 'profile.categories',
+                model: 'categories'
+            }
+        }, {
+            path: 'users',
+            model: 'users',
+            populate: {
+                path: 'profile.preference.categories.category',
+                model: 'categories',
+            }
+        }]).exec()
+    },
+
+    populate: async (recommendation: Document): Promise<Document> => {
+        return recommendation.populate([{
+            path: 'histories.restaurant',
+            model: 'restaurants',
+            populate: {
+                path: 'profile.categories',
+                model: 'categories'
+            }
+        }, {
+            path: 'users',
+            model: 'users',
+            populate: {
+                path: 'profile.preference.categories.category',
+                model: 'categories',
+            }
+        }]).execPopulate()
     }
 }

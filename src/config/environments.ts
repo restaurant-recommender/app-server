@@ -7,4 +7,5 @@ export default {
     recommenderURL: process.env.RECOMMENDER_URL ?? '',
     port: process.env.PORT ?? '',
     appSecret: process.env.APP_SECRET ?? '',
+    googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY ?? '',
 }

@@ -1,18 +1,18 @@
 import { Request, Response } from 'express'
 import { Document } from 'mongoose'
-import Restaurant, { pointInterface } from '../models/restaurant.model'
-import Recommenation, { HistoryInterface } from '../models/recommendation.model'
+import Restaurant, { IPoint } from '../models/restaurant.model'
+import Recommenation, { IHistory } from '../models/recommendation.model'
 import mongoose from 'mongoose'
 import { recommendationService, restaurantService } from '../services'
 
 export interface InitialRequest {
     users: string[]
-    location: pointInterface
+    location: IPoint
 }
 
 export interface UpdateRequest {
     token: string
-    histories: HistoryInterface[]
+    histories: IHistory[]
 }
 
 export interface CompletedRequest {
@@ -134,14 +134,31 @@ export const recommendationController = {
 
     requestRecommendation: (req: Request, res: Response): void => {
         recommendationService.updateRecommendation(req.body).then((recommendation) => {
-            recommendationService.getRecommendation(recommendation.toObject()).then((restaurants) => {
-                console.log(restaurants)
-                res.json({
-                    token: recommendation.toObject()._id,
-                    recommendations: restaurants,
+            // recommendation.populate(([{
+            //     path: 'histories.restaurant',
+            //     model: 'restaurants',
+            //     populate: {
+            //         path: 'profile.categories',
+            //         model: 'categories'
+            //     }
+            // }, {
+            //     path: 'users',
+            //     model: 'users',
+            //     populate: {
+            //         path: 'profile.preference.categories.category',
+            //         model: 'categories',
+            //     }
+            // }])).execPopulate().then((r) => console.log(r))
+            recommendationService.populate(recommendation).then((recommendation) => {
+                recommendationService.getRecommendation(recommendation.toObject()).then((restaurants) => {
+                    // console.log(restaurants)
+                    res.json({
+                        token: recommendation.toObject()._id,
+                        recommendations: restaurants,
+                    })
+                }).catch((error) => {
+                    throw(error)
                 })
-            }).catch((error) => {
-                throw(error)
             })
         }).catch((error) => {
             res.status(500).send(error)
@@ -158,15 +175,14 @@ export const recommendationController = {
     },
 
     getById: (req: Request, res: Response): void => {
-        Recommenation.findById(req.params.id, (err: any, user: Document) => {
-            if (err) {
-                res.send(err)
-            }
-            res.json(user)
+        recommendationService.getById(req.params.id).then((result) => {
+            res.json(result)
+        }).catch((error) => {
+            res.status(500).send(error)
         })
     },
 
-    getDetailedById: (req: Request, res: Response): void => {
+    getDetailedRestaurantById: (req: Request, res: Response): void => {
         recommendationService.getByIdWithUserHistory(req.params.id).then((result) => {
             res.json(result)
         }).catch((error) => {

@@ -1,23 +1,26 @@
-import { restaurantInterface } from '../models/restaurant.model'
+import { IRestaurant } from '../models/restaurant.model'
 import { restaurantService } from '../services'
 import fuzz from 'fuzzball'
 
-export const getDuplicateRestaurant = (restaurant: restaurantInterface): Promise<void | restaurantInterface> => {
+export const getDuplicateRestaurant = (restaurant: IRestaurant): Promise<void | IRestaurant> => {
     const distance = 200 // meters
-    const ratio = 70
+    const ratio = 65
 
-    return restaurantService.getByDistance(restaurant.location.coordinates[1], restaurant.location.coordinates[0], distance).then((nearyByRestarants) => {
+    return restaurantService.getByDistance({}, restaurant.location.coordinates[1], restaurant.location.coordinates[0], distance).then((nearyByRestarants) => {
         for (let i = 0; i < nearyByRestarants.length; i++) {
             const nearByRestaurant = nearyByRestarants[i]
-            if (nearByRestaurant.name.toLowerCase().includes(restaurant.name.toLowerCase()) || nearByRestaurant.name.toLowerCase().includes(restaurant.name.toLowerCase()) || fuzz.ratio(nearByRestaurant.name.toLowerCase(), restaurant.name.toLowerCase()) >= ratio) {
+            if (nearByRestaurant.name.toLowerCase().replace(' ', '').includes(restaurant.name.toLowerCase().replace(' ', '')) || 
+                restaurant.name.toLowerCase().replace(' ', '').includes(nearByRestaurant.name.toLowerCase().replace(' ', '')) || 
+                fuzz.ratio(nearByRestaurant.name.toLowerCase(), restaurant.name.toLowerCase()) >= ratio ||
+                nearByRestaurant.name === restaurant.name) {
                 return nearByRestaurant
             }
-            return null
         }
+        return null
     })
 }
 
-export const getDetailedRestaurant = (firstRestaurant: restaurantInterface, secondRestaurant: restaurantInterface): restaurantInterface => {
+export const getDetailedRestaurant = (firstRestaurant: IRestaurant, secondRestaurant: IRestaurant): IRestaurant => {
     const point = {
         perCategory: 10,
         forPriceRange: 10,
@@ -27,7 +30,7 @@ export const getDetailedRestaurant = (firstRestaurant: restaurantInterface, seco
         forPhoneNo: 2
     }
 
-    const calculatePoint = (restaurant: restaurantInterface) => (
+    const calculatePoint = (restaurant: IRestaurant) => (
         (([...new Set( [restaurant.profile.categories] )]).length * point.perCategory) + 
         (restaurant.profile.price_range ? point.forPriceRange : 0) +
         (restaurant.profile.rating ? point.forRating : 0) +

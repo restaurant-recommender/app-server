@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-export interface categoryInterface {
+export interface ICategory {
     name_th: string
     name_en: string
     ref_id: string

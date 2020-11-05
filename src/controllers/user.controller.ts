@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { Document } from 'mongoose'
+import { userService } from '../services'
 import User from '../models/user.model'
 import mongoose from 'mongoose'
 
@@ -35,20 +36,28 @@ export const userController = {
         })
     },
 
-    createUser: (req: Request, res: Response): void => {
-        let categoryIds: [any?] = []
-        req.body.profile.preference.categories.forEach((e: string) => {
-            categoryIds.push(mongoose.Types.ObjectId(e))
-        })
-        req.body.profile.preference.categories = categoryIds
-    
-        const user = new User(req.body)
-    
-        user.save((err: any, user: Document) => {
-            if (err) {
-                res.send(err)
-            }
+    create: (req: Request, res: Response): void => {
+        userService.create(req.body).then((user) => {
             res.json(user)
+        }).catch((error) => {
+            res.status(500).send(error)
         })
-    }
+    },
+
+    update: (req: Request, res: Response): void => {
+        userService.update(req.params.id, req.body).then((user) => {
+            res.json(user)
+        }).catch((error) => {
+            res.status(500).send(error)
+        })
+    },
+
+    updateProfileWeight: (req: Request, res: Response): void => {
+        try {
+            userService.updateProfileWeight(req.params.id, req.body)
+            res.status(200).send('ok')
+        } catch (error) {
+            res.status(500).send(error)
+        }
+    },
 }

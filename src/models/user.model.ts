@@ -1,19 +1,23 @@
 import mongoose from 'mongoose'
-import { categoryInterface } from './category.model'
-import { recommendationInterface } from './recommendation.model'
+import { ICategory } from './category.model'
+import { IRecommendation } from './recommendation.model'
 
-export interface userInterface {
+export interface IUser {
     username: string
     profile: {
         gender: 'male' | 'female'
         birthdate: Date
         preference: {
-            categories: string[] | categoryInterface[]
+            categories: {
+                category: string | mongoose.Types.ObjectId | ICategory
+                value: number
+                original_value: number
+            }[]
             price_range: number
             prefer_nearby: boolean
         }
     }
-    recommendation_histories: string[] | recommendationInterface[]
+    recommendation_histories: string[] | IRecommendation[]
     is_active: boolean
 }
 
@@ -25,10 +29,16 @@ const schema = new mongoose.Schema({
             birthdate: Date,
             preference: {
                 type: {
-                    categories: [{
-                        type: mongoose.Types.ObjectId,
-                        ref: 'categories'
-                    }],
+                    categories:{
+                        type: {
+                            category: {
+                                type: mongoose.Types.ObjectId,
+                                ref: 'categories'
+                            },
+                            value: Number,
+                            original_value: Number,
+                        }
+                    },
                     price_range: Number,
                     prefer_nearby: Boolean,
                 }
