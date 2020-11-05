@@ -16,9 +16,7 @@ const create = async (restaurant: IRestaurant): Promise<Document | void | any> =
 }
 
 const createWithValidation = async (newRestaurant: IRestaurant): Promise<IRestaurant | void> => {
-    console.log(newRestaurant.name)
     return getDuplicateRestaurant(newRestaurant).then((duplidatedRestaurant: IRestaurant | void) => {
-        console.log(duplidatedRestaurant)
         let targetRestaurant: IRestaurant = newRestaurant
         if (duplidatedRestaurant) {
             targetRestaurant = getDetailedRestaurant(duplidatedRestaurant, newRestaurant)
@@ -73,7 +71,6 @@ const getByQuery = async (query: any): Promise<Document[]> => {
 }
 
 const getByDistance = async (query: any, latitude: number, longitude: number, maxDistance?: number, limit?: number, skip?: number): Promise<IRestaurant[]> => {
-    console.log(maxDistance)
     const geoNearQuery = Object.assign({
         near: {
             type: 'Point',
@@ -84,8 +81,6 @@ const getByDistance = async (query: any, latitude: number, longitude: number, ma
     },
         maxDistance === null ? null : { maxDistance },
     )
-
-    console.log(geoNearQuery)
 
     let optionQuerys: any[] = []
     if (limit && !skip) {

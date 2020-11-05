@@ -9,7 +9,7 @@ import { restaurantService } from './restaurant.service'
 
 export const recommendationService = {
     initializeRecommendation: async (initialRequest: InitialRequest): Promise<void | Document> => {
-
+        console.log('Fecting nearby restaurants from Google')
         restaurantService.fetchNearby(initialRequest.location.coordinates[1], initialRequest.location.coordinates[0])
 
         let userIds: [any?] = []
@@ -38,27 +38,12 @@ export const recommendationService = {
         return axios.post(`${env.recommenderURL}/recommend/simple`, recommendation).then((result) => {
             if (result.data.status) {
                 const ids: object[] = result.data.restaurant_ids.map((id: any) => mongoose.Types.ObjectId(id))
-                // return Restaurant.find({
-                //     _id: { $in: result.data.restaurant_ids.map((id: any) => mongoose.Types.ObjectId(id)) }
-                // }).populate({
-                //     path: 'profile.categories',
-                //     model: 'categories'
-                // }).then((documents: Document[]) => 
-                //     documents.sort((a, b) => ids.findIndex(id => a._id.equals(id) - ids.findIndex(id => b._id.equals(id) )))
-                // )
                 return Restaurant.aggregate([
                     { $match: { _id: {$in: ids }}},
                     { $addFields: {"__order": {$indexOfArray: [ ids, "$_id" ]}}},
                     { $sort: {"__order": 1 }},
                     { $lookup: { from: 'categories', localField: 'profile.categories', foreignField: '_id', as: 'profile.categories' }}
                 ]).exec()
-                
-                
-                
-
-            //     {$match: {name: {$in: order}}},
-            //  {$addFields: {"__order": {$indexOfArray: [order, "$name" ]}}},
-            //  {$sort: {"__order": 1}}
             } else {
                 throw('Recommendation system error!')
             }
