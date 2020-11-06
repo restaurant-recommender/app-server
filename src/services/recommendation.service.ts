@@ -9,8 +9,10 @@ import { restaurantService } from './restaurant.service'
 
 export const recommendationService = {
     initializeRecommendation: async (initialRequest: InitialRequest): Promise<void | Document> => {
-        console.log('Fecting nearby restaurants from Google')
-        restaurantService.fetchNearby(initialRequest.location.coordinates[1], initialRequest.location.coordinates[0])
+        if (env.nearbyFetchEnabled) {
+            console.log('Fecting nearby restaurants from Google')
+            restaurantService.fetchNearby(initialRequest.location.coordinates[1], initialRequest.location.coordinates[0])
+        }
 
         let userIds: [any?] = []
         initialRequest.users.forEach((userId: string) => {

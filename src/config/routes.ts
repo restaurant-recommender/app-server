@@ -29,6 +29,7 @@ router.get('/api/restaurants', restaurnatController.getAll)
 router.get('/api/restaurants/search', restaurnatController.search)
 router.post('/api/restaurants/forced', restaurnatController.forcedCreate)
 router.post('/api/restaurants', restaurnatController.create)
+router.put('/api/restaurants/:id', restaurnatController.update)
 
 router.get('/api/categories', categoryController.getAllCategories)
 router.post('/api/categories', categoryController.createCategory)

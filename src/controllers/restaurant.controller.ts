@@ -55,5 +55,15 @@ export const restaurnatController = {
             console.log(error)
             res.status(500).send(error) 
         })
-    }
+    },
+
+    update: (req: Request, res: Response): void => {
+        console.log(req.body)
+        restaurantService.update(req.params.id, req.body).then((restaurant) => {
+            res.json(restaurant)
+        }).catch((error) => { 
+            console.log(error)
+            res.status(500).send(error)
+        })
+    },
 }

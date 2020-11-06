@@ -17,7 +17,7 @@ export const userService = {
     },
 
     update: async (id: string, user: IUser): Promise<Document> => {
-        return User.findByIdAndUpdate(id, { $set: user }, { new: true}).exec()
+        return User.findByIdAndUpdate(id, { $set: user }, { new: true }).exec()
     },
 
     updateProfileWeight: (id: string, body: IUpdateProfileWeightRequest[]): void => {

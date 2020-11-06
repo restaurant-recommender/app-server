@@ -136,6 +136,16 @@ const fetchNearby = (latitude: number, longitude: number) => {
     })
 }
 
+const update = async (id: string, restaurant: IRestaurant): Promise<Document> => {
+    let categoryIds: [any?] = []
+    restaurant.profile.categories.forEach((catrgoryName: any) => {
+        categoryIds.push(mongoose.Types.ObjectId(catrgoryName))
+    })
+    restaurant.profile.categories = categoryIds
+    
+    return Restaurant.findByIdAndUpdate(id, { $set: restaurant }, { new: true }).exec()
+}
+
 export const restaurantService = {
     create,
     deleteById,
@@ -145,4 +155,5 @@ export const restaurantService = {
     getByDistance,
     createWithValidation,
     fetchNearby,
+    update,
 }
