@@ -2,7 +2,8 @@ import express from 'express'
 import { 
     userController, 
     restaurnatController, 
-    categoryController, 
+    categoryController,
+    reportController,
     recommendationController, 
     authenticationController 
 } from '../controllers'
@@ -36,11 +37,10 @@ router.post('/api/categories', categoryController.createCategory)
 router.put('/api/categories/:id', categoryController.update)
 router.get('/api/categories/search', categoryController.searchCategories)
 
-// router.post('/api/recommendations', recommendationController.requestRecommendation)
 router.post('/api/recommendations/init', recommendationController.initRecommendation)
 router.post('/api/recommendations/request', recommendationController.requestRecommendation)
-// router.get('/api/recommendations/detailed/:id', recommendationController.getDetailedById)
-// router.get('/api/recommendations/:id', recommendationController.getRecommendation)
-// router.get('/api/recommendations', recommendationController.getAllRecommendations)
+
+router.get('/api/reports', reportController.getByQuery)
+router.post('/api/reports', reportController.create)
 
 export default router

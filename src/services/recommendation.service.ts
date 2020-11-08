@@ -116,10 +116,6 @@ export const recommendationService = {
         }, {
             path: 'users',
             model: 'users',
-            populate: {
-                path: 'profile.preference.categories.category',
-                model: 'categories',
-            }
         }]).execPopulate()
     }
 }

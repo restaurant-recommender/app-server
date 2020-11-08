@@ -5,6 +5,7 @@ import { IUser } from './user.model'
 export interface IHistory {
     restaurant: string | IRestaurant
     is_love: boolean
+    is_skip: boolean
     rating: number
     timestamp: Date
 }
@@ -27,6 +28,10 @@ const historySchema = new mongoose.Schema({
         ref: 'restuarants'
     },
     is_love: Boolean,
+    is_skip:  {
+        type: Boolean,
+        default: false,
+    },
     rating: Number,
     timestamp: Date,
 })
