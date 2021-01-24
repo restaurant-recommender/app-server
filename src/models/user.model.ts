@@ -2,12 +2,21 @@ import mongoose from 'mongoose'
 import { ICategory } from './category.model'
 import { IRecommendation } from './recommendation.model'
 
+export interface IPreference {
+    _id: string
+    name_en: string
+    order: number
+}
+
 export interface IUser {
     username: string
-    profile: {
+    password: string
+    has_profile: boolean
+    profile?: {
         gender: 'male' | 'female'
         birthdate: Date
         preference: {
+            ordered_categories: IPreference[]
             categories: {
                 category: string | mongoose.Types.ObjectId | ICategory
                 value: number
@@ -23,12 +32,21 @@ export interface IUser {
 
 const schema = new mongoose.Schema({
     username: String,
+    password: String,
+    has_profile: Boolean,
     profile: {
         type: {
             gender: String,
             birthdate: Date,
             preference: {
                 type: {
+                    ordered_categories: {
+                        type: {
+                            _id: String,
+                            name_en: String,
+                            order: Number,
+                        }
+                    },
                     categories:{
                         type: {
                             category: {
@@ -56,4 +74,6 @@ const schema = new mongoose.Schema({
 })
 
 export const userSchema = schema
-export default mongoose.model('users', schema)
+export const User = mongoose.model('users', schema)
+
+export default User

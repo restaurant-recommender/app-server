@@ -1,8 +1,19 @@
 import { Request, Response } from 'express'
 import { Document } from 'mongoose'
+import { categoryService } from '../services'
 import Category from '../models/category.model'
+import { errorResponse, successResponse } from '../utilities/controller'
 
 export const categoryController = {
+    getCommonCategories: (req: Request, res: Response): void => {
+        categoryService.getCommonCetegories(req.query.lang as string).then((categories) => {
+            res.json(successResponse(categories))
+        }).catch((error) => { res.json(errorResponse(error)) })
+    },
+
+    // ------------------------------------------
+
+
     update: (req: Request, res: Response): void => {
         Category.findOneAndUpdate({ _id: req.params.id, is_active: true }, req.body, (err: any, category: Document) => {
             if (err) {

@@ -1,10 +1,25 @@
 import { Request, Response } from 'express'
 import { Document } from 'mongoose'
 import { userService } from '../services'
-import User from '../models/user.model'
+import User, { IUser } from '../models/user.model'
 import mongoose from 'mongoose'
+import { errorResponse, successResponse } from '../utilities/controller'
 
 export const userController = {
+    updatePreferences: (req: Request, res: Response): void => {
+        userService.updatePreferences(req.params.id, req.body).then((result) => {
+            if (result) {
+                res.json(successResponse(null))
+            }
+        }).catch((error) => { throw(error) })
+    },
+
+    getPreferences: (req: Request, res: Response): void => {
+        userService.getPreferences(req.params.id).then((preferences) => {
+            res.json(successResponse(preferences))
+        }).catch((error) => { res.json(errorResponse(error)) })
+    },
+    
     hasUsername: (req: Request, res: Response): void => {
         User.findOne({ username: req.params.username }, (err: any, user: Document) => {
             if (err) {

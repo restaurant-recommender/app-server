@@ -5,7 +5,6 @@ import { IUser } from './user.model'
 export interface IHistory {
     restaurant: string | IRestaurant
     is_love: boolean
-    is_skip: boolean
     rating: number
     timestamp: Date
 }
@@ -14,12 +13,24 @@ export interface IRecommendation {
     _id: string
     histories: IHistory[]
     users: string[] | IUser[]
+    members: IMember[]
     location: IPoint
     created_at: Date
     completed_at: Date
     rating: number
-    is_complete: boolean
+    group_pin: string
+    is_completed: boolean
+    is_started: boolean
     is_active: boolean
+    is_group: boolean
+}
+
+export interface IMember {
+    _id: string
+    username: string
+    categories: string[]
+    price_range: number
+    is_head: boolean
 }
 
 const historySchema = new mongoose.Schema({
@@ -36,17 +47,31 @@ const historySchema = new mongoose.Schema({
     timestamp: Date,
 })
 
+const memberSchema = new mongoose.Schema({
+    username: String,
+    categories: [String],
+    price_range: Number,
+    is_head: Boolean,
+})
+
 const schema = new mongoose.Schema({
     histories: [historySchema],
-    users: [{
-        type: mongoose.Types.ObjectId,
-        ref: 'users',
-    }],
+    // users: [{
+    //     type: mongoose.Types.ObjectId,
+    //     ref: 'users',
+    // }],
+    members: [memberSchema],
     location: pointSchema,
     created_at: Date,
     completed_at: Date,
     rating: Number,
-    is_complete: {
+    group_pin: String,
+    is_group: Boolean,
+    is_started: {
+        type: Boolean,
+        default: false,
+    },
+    is_completed: {
         type: Boolean,
         default: false,
     },

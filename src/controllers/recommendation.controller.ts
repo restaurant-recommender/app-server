@@ -4,6 +4,7 @@ import Restaurant, { IPoint } from '../models/restaurant.model'
 import Recommenation, { IHistory } from '../models/recommendation.model'
 import mongoose from 'mongoose'
 import { recommendationService, restaurantService } from '../services'
+import { successResponse, errorResponse } from '../utilities/controller'
 
 export interface InitialRequest {
     users: string[]
@@ -92,6 +93,41 @@ const completeRecommendation = (res: Response, token: String, requestData: Compl
 }
 
 export const recommendationController = {
+    initialize: (req: Request, res: Response): void => {
+        recommendationService.initialize(req.body.members, req.body.location, req.body.is_group).then((recommendation) => {
+            res.json(successResponse(recommendation))
+        }).catch((error) => { console.log(error); res.json(errorResponse(error))})
+    },
+
+    request: (req: Request, res: Response): void => {
+        recommendationService.request(req.params.id).then((restaurants) => {
+            res.json(successResponse(restaurants))
+        }).catch((error) => { res.json(errorResponse(error))})
+    },
+
+    updateHistories: (req: Request, res: Response): void => {
+        recommendationService.updateHistories(req.params.id, req.body.histories).then((_) => {
+            res.json(successResponse(null))
+        }).catch((error) => { res.json(errorResponse(error))})
+    },
+
+    updateRating: (req: Request, res: Response): void => {
+        recommendationService.updateRating(req.params.id, req.body.rating).then((_) => {
+            res.json(successResponse(null))
+        }).catch((error) => { res.json(errorResponse(error))})
+    },
+
+    complete: (req: Request, res: Response): void => {
+        recommendationService.complete(req.params.id).then((_) => {
+            res.json(successResponse(null))
+        }).catch((error) => { res.json(errorResponse(error))})
+    },
+
+    getFinal:  (req: Request, res: Response): void => {
+        recommendationService.getFinal(req.params.id).then((restaurant) => {
+            res.json(successResponse(restaurant))
+        }).catch((error) => { res.json(errorResponse(error))})
+    },
     // requestRecommendation: (req: Request, res: Response) => {
     //     const body = req.body
     //     if ('token' in body) {
@@ -125,7 +161,7 @@ export const recommendationController = {
     // },
 
     initRecommendation: (req: Request, res: Response): void => {
-        recommendationService.initializeRecommendation(req.body).then((result) => {
+        recommendationService.initializeRecommendationDeprecated(req.body).then((result) => {
             res.json(result)
         }).catch((error) => {
             res.status(500).send(error)

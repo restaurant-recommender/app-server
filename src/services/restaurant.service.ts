@@ -104,7 +104,9 @@ const getByDistance = async (query: any, latitude: number, longitude: number, ma
             { $match: query },
             ...optionQuerys,
             { $lookup: { from: 'categories', localField: 'profile.categories', foreignField: '_id', as: 'profile.categories' } },
-        ]).exec()
+        ]).then((documents) => {
+            return documents.map((document) => document as IRestaurant)
+        })
     } catch (error) {
         throw (error)
     }

@@ -7,7 +7,7 @@ import env from './environments'
 
 const app = express()
 
-require('@google-cloud/debug-agent').start({serviceContext: {enableCanary: true}});
+// require('@google-cloud/debug-agent').start({serviceContext: {enableCanary: true}});
 
 // config
 app.use(bodyParser.json())

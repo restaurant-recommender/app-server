@@ -7,6 +7,7 @@ import {
     recommendationController, 
     authenticationController 
 } from '../controllers'
+import { auth } from '../utilities/authentication'
 
 const router = express.Router()
 
@@ -16,7 +17,22 @@ router.get('/api/_hc', (_, res) => {
     })
 })
 
-router.post('/api/auth', authenticationController.login)
+router.post('/api/auth/login', authenticationController.login)
+router.post('/api/auth/register', authenticationController.register)
+
+router.post('/api/users/:id/preferences', userController.updatePreferences)
+router.get('/api/users/:id/preferences', userController.getPreferences)
+
+router.get('/api/categories/common', categoryController.getCommonCategories)
+
+router.post('/api/recommendations/init', recommendationController.initialize)
+router.get('/api/recommendations/:id/request', recommendationController.request)
+router.get('/api/recommendations/:id/final', recommendationController.getFinal)
+router.post('/api/recommendations/:id/history', recommendationController.updateHistories)
+router.post('/api/recommendations/:id/complete', recommendationController.complete)
+router.post('/api/recommendations/:id/rate', recommendationController.updateRating)
+
+// Common --------------------------------------------
 
 router.get('/api/users', userController.getAllUsers)
 router.get('/api/users/:id', userController.getUser)
@@ -37,8 +53,8 @@ router.post('/api/categories', categoryController.createCategory)
 router.put('/api/categories/:id', categoryController.update)
 router.get('/api/categories/search', categoryController.searchCategories)
 
-router.post('/api/recommendations/init', recommendationController.initRecommendation)
-router.post('/api/recommendations/request', recommendationController.requestRecommendation)
+router.post('/api/v0/recommendations/init', recommendationController.initRecommendation)
+router.post('/api/v0/recommendations/request', recommendationController.requestRecommendation)
 
 router.get('/api/reports', reportController.getByQuery)
 router.post('/api/reports', reportController.create)

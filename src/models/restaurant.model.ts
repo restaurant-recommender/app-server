@@ -23,6 +23,9 @@ export interface IRestaurant {
     ref_id: string
     link: string
     is_active?: boolean
+    dist?: {
+        calculated: number
+    }
 }
 
 export interface IPoint {
