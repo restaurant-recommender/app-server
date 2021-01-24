@@ -6,7 +6,7 @@
     "dev": "ts-node-dev ./src/server.ts",
     "gcp-build": "tsc -p .",
     "start": "node ./dist/server.js",
-    "deploy": "gcloud app deploy"
+    "deploy": "gcloud app deploy --quiet"
   },
   "license": "MIT",
   "dependencies": {
