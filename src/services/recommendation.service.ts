@@ -9,9 +9,13 @@ import { restaurantService } from './restaurant.service'
 import { distance } from '../utilities/function'
 
 
-const initialize = async (members: IMember[], location: [number, number], isGroup: boolean): Promise<IRecommendation> => {
+const initialize = async (members: IMember[], location: [number, number], isGroup: boolean, type: string): Promise<IRecommendation> => {
+    let groupPin = null
+    console.log('into init')
     if (isGroup) {
-        // TODO: generate group pin
+        do {
+            groupPin = Math.floor(100000 + Math.random() * 900000)
+        } while  (await Recommendation.findOne({group_pin: groupPin, is_completed: false}).then((doc) => doc ? true : false)) 
     }
     const recommendation = new Recommendation({
         members: members,
@@ -21,7 +25,11 @@ const initialize = async (members: IMember[], location: [number, number], isGrou
         },
         created_at: Date.now(),
         is_group: isGroup,
+        group_pin: groupPin,
+        type: type,
     })
+    console.log(recommendation)
+    console.log('nre recommendation')
     return recommendation.save().then((document) => document.toObject() as IRecommendation)
 }
 
@@ -29,7 +37,7 @@ const request = async (id: string): Promise<IRestaurant[]> => {
     return Recommendation.findById(id).then((document) => {
         const recommendation: IRecommendation = document.toObject() as IRecommendation
         console.log(recommendation.histories.length)
-        return restaurantService.getByDistance({}, recommendation.location.coordinates[1], recommendation.location.coordinates[0], 20000, 100 + recommendation.histories.length).then((restaurants) => {
+        return restaurantService.getByDistance({ type: recommendation.type }, recommendation.location.coordinates[1], recommendation.location.coordinates[0], 20000, 100 + recommendation.histories.length).then((restaurants) => {
             const filteredRestaurants = restaurants.filter((restaurant) => !recommendation.histories.map((history) => history.restaurant.toString()).includes(restaurant._id.toString()))
             console.log(filteredRestaurants.length)
             const body = {
@@ -55,8 +63,25 @@ const updateRating = async (id: string, rating: number): Promise<boolean> => {
     return Recommendation.findByIdAndUpdate(id, { rating: rating }, { new: true }).then((document) => document ? true : false)
 }
 
+const update = async (id: string, recommendation: IRecommendation): Promise<IRecommendation> => {
+    return Recommendation.findByIdAndUpdate(id, recommendation, { new: true }).then((document) => document.toObject() as IRecommendation)
+}
+
 const complete = async (id: string): Promise<boolean> => {
     return Recommendation.findByIdAndUpdate(id, { is_completed: true }, { new: true }).then((document) => document ? true : false)
+}
+
+const joinGroup = async (pin:string, member: IMember): Promise<IRecommendation> => {
+    return Recommendation.findOne({ group_pin: pin, is_started: false }).then((document) => {
+        const recommendation = document.toObject() as IRecommendation
+        if (recommendation.members.map((member) => member._id.toString()).includes(member._id.toString())) {
+            // user already joined
+            return recommendation
+        } else {
+            member._id = mongoose.Types.ObjectId(member._id)
+            return Recommendation.findByIdAndUpdate(recommendation._id, { $push: { members: member } }, { new: true }).then((document) => document.toObject() as IRecommendation)
+        }
+    })
 }
 
 
@@ -84,6 +109,16 @@ const getFinal = async (id: string): Promise<IRestaurant> => {
     })
 }
 
+const updateMemberPreferPrice = async (recommendationId: string, userId: string, preferPrice: number) : Promise<boolean> => {
+    return Recommendation.findOneAndUpdate({_id: recommendationId, "members._id": userId}, {"members.$.price_range": preferPrice}).then((document) => document ? true : false)
+}
+
+const updateMemberRestaurantRank = async (recommendationId: string, userId: string, rank: string[]) : Promise<boolean> => {
+    return Recommendation.findOneAndUpdate({_id: recommendationId, "members._id": userId}, {"members.$.rank": rank}).then((document) => document ? true : false)
+}
+
+const getById = async (id: string): Promise<IRecommendation> => Recommendation.findById(id).then((document) => document.toObject() as IRecommendation)
+
 export const recommendationService = {
     initialize,
     request,
@@ -91,6 +126,11 @@ export const recommendationService = {
     complete,
     getFinal,
     updateRating,
+    joinGroup,
+    getById,
+    update,
+    updateMemberPreferPrice,
+    updateMemberRestaurantRank,
 
 
     initializeRecommendationDeprecated: async (initialRequest: InitialRequest): Promise<void | Document> => {
@@ -172,7 +212,7 @@ export const recommendationService = {
         }]).exec()
     },
 
-    getById: async (id: string) : Promise<Document> => {
+    getByIdDeprecated: async (id: string) : Promise<Document> => {
         return Recommendation.findById(id).populate([{
             path: 'histories.restaurant',
             model: 'restaurants',

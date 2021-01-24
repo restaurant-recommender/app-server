@@ -31,6 +31,12 @@ router.get('/api/recommendations/:id/final', recommendationController.getFinal)
 router.post('/api/recommendations/:id/history', recommendationController.updateHistories)
 router.post('/api/recommendations/:id/complete', recommendationController.complete)
 router.post('/api/recommendations/:id/rate', recommendationController.updateRating)
+router.post('/api/recommendations/:id/members/:userid/price', recommendationController.updateMemberPreferPrice)
+router.post('/api/recommendations/:id/members/:userid/rank', recommendationController.updateMemberRestaurantRank)
+router.get('/api/recommendations/:id', recommendationController.getById)
+router.post('/api/recommendations/:id', recommendationController.update)
+
+router.post('/api/group/:pin/join', recommendationController.joinGroup)
 
 // Common --------------------------------------------
 

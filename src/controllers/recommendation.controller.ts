@@ -9,6 +9,8 @@ import { successResponse, errorResponse } from '../utilities/controller'
 export interface InitialRequest {
     users: string[]
     location: IPoint
+    is_group: boolean
+    type: string
 }
 
 export interface UpdateRequest {
@@ -94,9 +96,10 @@ const completeRecommendation = (res: Response, token: String, requestData: Compl
 
 export const recommendationController = {
     initialize: (req: Request, res: Response): void => {
-        recommendationService.initialize(req.body.members, req.body.location, req.body.is_group).then((recommendation) => {
+        console.log('init group')
+        recommendationService.initialize(req.body.members, req.body.location, req.body.is_group, req.body.type).then((recommendation) => {
             res.json(successResponse(recommendation))
-        }).catch((error) => { console.log(error); res.json(errorResponse(error))})
+        }).catch((error) => { console.log('...'); console.log(error); res.json(errorResponse(error))})
     },
 
     request: (req: Request, res: Response): void => {
@@ -123,9 +126,39 @@ export const recommendationController = {
         }).catch((error) => { res.json(errorResponse(error))})
     },
 
-    getFinal:  (req: Request, res: Response): void => {
+    getFinal: (req: Request, res: Response): void => {
         recommendationService.getFinal(req.params.id).then((restaurant) => {
             res.json(successResponse(restaurant))
+        }).catch((error) => { res.json(errorResponse(error))})
+    },
+
+    joinGroup: (req: Request, res: Response): void => {
+        recommendationService.joinGroup(req.params.pin, req.body.member).then((recommendation) => {
+            res.json(successResponse(recommendation))
+        }).catch((error) => { res.json(errorResponse(error))})
+    },
+
+    getById: (req: Request, res: Response): void => {
+        recommendationService.getById(req.params.id).then((recommendation) => {
+            res.json(successResponse(recommendation))
+        }).catch((error) => { res.json(errorResponse(error))})
+    },
+
+    update: (req: Request, res: Response): void => {
+        recommendationService.update(req.params.id, req.body.recommendation).then((recommendation) => {
+            res.json(successResponse(recommendation))
+        }).catch((error) => { res.json(errorResponse(error))})
+    },
+
+    updateMemberPreferPrice: (req: Request, res: Response): void => {
+        recommendationService.updateMemberPreferPrice(req.params.id, req.params.userid, req.body.prefer_price).then((_) => {
+            res.json(successResponse(null))
+        }).catch((error) => { res.json(errorResponse(error))})
+    },
+
+    updateMemberRestaurantRank: (req: Request, res: Response): void => {
+        recommendationService.updateMemberRestaurantRank(req.params.id, req.params.userid, req.body.rank).then((_) => {
+            res.json(successResponse(null))
         }).catch((error) => { res.json(errorResponse(error))})
     },
     // requestRecommendation: (req: Request, res: Response) => {
@@ -210,13 +243,13 @@ export const recommendationController = {
         })
     },
 
-    getById: (req: Request, res: Response): void => {
-        recommendationService.getById(req.params.id).then((result) => {
-            res.json(result)
-        }).catch((error) => {
-            res.status(500).send(error)
-        })
-    },
+    // getById: (req: Request, res: Response): void => {
+    //     recommendationService.getById(req.params.id).then((result) => {
+    //         res.json(result)
+    //     }).catch((error) => {
+    //         res.status(500).send(error)
+    //     })
+    // },
 
     getDetailedRestaurantById: (req: Request, res: Response): void => {
         recommendationService.getByIdWithUserHistory(req.params.id).then((result) => {

@@ -19,6 +19,7 @@ export interface IRecommendation {
     completed_at: Date
     rating: number
     group_pin: string
+    type: string
     is_completed: boolean
     is_started: boolean
     is_active: boolean
@@ -26,10 +27,11 @@ export interface IRecommendation {
 }
 
 export interface IMember {
-    _id: string
+    _id: any
     username: string
     categories: string[]
     price_range: number
+    rank: string[]
     is_head: boolean
 }
 
@@ -51,6 +53,7 @@ const memberSchema = new mongoose.Schema({
     username: String,
     categories: [String],
     price_range: Number,
+    rank: [String],
     is_head: Boolean,
 })
 
@@ -65,6 +68,7 @@ const schema = new mongoose.Schema({
     created_at: Date,
     completed_at: Date,
     rating: Number,
+    type: String,
     group_pin: String,
     is_group: Boolean,
     is_started: {
