@@ -115,7 +115,7 @@ export const recommendationController = {
     },
 
     updateRating: (req: Request, res: Response): void => {
-        recommendationService.updateRating(req.params.id, req.body.rating).then((_) => {
+        recommendationService.updateRating(req.params.id, req.params.userid, req.body.rating).then((_) => {
             res.json(successResponse(null))
         }).catch((error) => { res.json(errorResponse(error))})
     },
@@ -157,8 +157,8 @@ export const recommendationController = {
     },
 
     updateMemberRestaurantRank: (req: Request, res: Response): void => {
-        recommendationService.updateMemberRestaurantRank(req.params.id, req.params.userid, req.body.rank).then((_) => {
-            res.json(successResponse(null))
+        recommendationService.updateMemberRestaurantRank(req.params.id, req.params.userid, req.body.rank).then((recommendation) => {
+            res.json(successResponse(recommendation))
         }).catch((error) => { res.json(errorResponse(error))})
     },
     // requestRecommendation: (req: Request, res: Response) => {

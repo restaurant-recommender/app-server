@@ -72,6 +72,11 @@ const schema = new mongoose.Schema({
     ref: String,
     ref_id: String,
     link: String,
+    dist: {
+        type: {
+            calculated: Number
+        }
+    },
     is_active: {
         type: Boolean,
         default: true,

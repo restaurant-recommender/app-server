@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { pointSchema, IRestaurant, IPoint } from './restaurant.model'
+import { pointSchema, IRestaurant, IPoint, restaurantSchema } from './restaurant.model'
 import { IUser } from './user.model'
 
 export interface IHistory {
@@ -20,6 +20,8 @@ export interface IRecommendation {
     rating: number
     group_pin: string
     type: string
+    sugessted_restaurants: IRestaurant[]
+    final_restaurant: IRestaurant
     is_completed: boolean
     is_started: boolean
     is_active: boolean
@@ -32,6 +34,7 @@ export interface IMember {
     categories: string[]
     price_range: number
     rank: string[]
+    rating: number
     is_head: boolean
 }
 
@@ -54,6 +57,7 @@ const memberSchema = new mongoose.Schema({
     categories: [String],
     price_range: Number,
     rank: [String],
+    rating: Number,
     is_head: Boolean,
 })
 
@@ -67,8 +71,9 @@ const schema = new mongoose.Schema({
     location: pointSchema,
     created_at: Date,
     completed_at: Date,
-    rating: Number,
     type: String,
+    sugessted_restaurants: [restaurantSchema],
+    final_restaurant: restaurantSchema,
     group_pin: String,
     is_group: Boolean,
     is_started: {

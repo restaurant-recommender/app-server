@@ -7,6 +7,7 @@ import axios from 'axios'
 import env from '../config/environments'
 import { restaurantService } from './restaurant.service'
 import { distance } from '../utilities/function'
+import { rank } from '../utilities/ranking'
 
 
 const initialize = async (members: IMember[], location: [number, number], isGroup: boolean, type: string): Promise<IRecommendation> => {
@@ -37,7 +38,7 @@ const request = async (id: string): Promise<IRestaurant[]> => {
     return Recommendation.findById(id).then((document) => {
         const recommendation: IRecommendation = document.toObject() as IRecommendation
         console.log(recommendation.histories.length)
-        return restaurantService.getByDistance({ type: recommendation.type }, recommendation.location.coordinates[1], recommendation.location.coordinates[0], 20000, 100 + recommendation.histories.length).then((restaurants) => {
+        return restaurantService.getByDistance({ type: recommendation.type }, recommendation.location.coordinates[1], recommendation.location.coordinates[0], 2000, 100 + recommendation.histories.length).then((restaurants) => {
             const filteredRestaurants = restaurants.filter((restaurant) => !recommendation.histories.map((history) => history.restaurant.toString()).includes(restaurant._id.toString()))
             console.log(filteredRestaurants.length)
             const body = {
@@ -59,8 +60,8 @@ const updateHistories = async (id: string, histories: IHistory[]): Promise<boole
     return Recommendation.findByIdAndUpdate(id, { $push: { histories: { $each: histories}}}, { new: true }).then((document) => document ? true : false)
 }
 
-const updateRating = async (id: string, rating: number): Promise<boolean> => {
-    return Recommendation.findByIdAndUpdate(id, { rating: rating }, { new: true }).then((document) => document ? true : false)
+const updateRating = async (id: string, userId: string, rating: number): Promise<boolean> => {
+    return Recommendation.findOneAndUpdate({_id: id, "members._id": userId}, { "members.$.rating": rating }).then((document) => document ? true : false)
 }
 
 const update = async (id: string, recommendation: IRecommendation): Promise<IRecommendation> => {
@@ -89,21 +90,30 @@ const getFinal = async (id: string): Promise<IRestaurant> => {
     return Recommendation.findById(id).then((document) => {
         const recommendation = document.toObject() as IRecommendation
         const getDistance = (restaurant: IRestaurant): number => distance(restaurant.location.coordinates[1], restaurant.location.coordinates[0], recommendation.location.coordinates[1], recommendation.location.coordinates[0])
-        if (recommendation.is_group) {
+        if (recommendation.final_restaurant) {
+            return recommendation.final_restaurant
+        }
+        else if (recommendation.is_group) {
             // TODO: group finalization
-            return null
+            const orderedRestaurantIds = rank(recommendation.members.map((member) => member.rank))
+            const orderedRestaurant = orderedRestaurantIds.map((restaurantId) => recommendation.sugessted_restaurants.find((restaurant) => restaurant._id.toString() === restaurantId))
+            const finalRestaurant = orderedRestaurant[0]
+            Recommendation.findByIdAndUpdate(id, { final_restaurant: finalRestaurant }).exec()
+            return finalRestaurant
         } else {
             // individual finalization
             const finalRestaurantId = recommendation.histories.find((history) => history.is_love).restaurant as string
             return restaurantService.getById(finalRestaurantId).then((document) => {
                 const restaurant = document.toObject() as IRestaurant
                 const distance = getDistance(restaurant)
-                return {
+                const restaurantWithDistance = {
                     ...restaurant,
                     dist: {
                         calculated: distance,
                     }
                 }
+                Recommendation.findByIdAndUpdate(id, { final_restaurant: restaurantWithDistance }).exec()
+                return restaurantWithDistance
             })
         }
     })
@@ -113,8 +123,16 @@ const updateMemberPreferPrice = async (recommendationId: string, userId: string,
     return Recommendation.findOneAndUpdate({_id: recommendationId, "members._id": userId}, {"members.$.price_range": preferPrice}).then((document) => document ? true : false)
 }
 
-const updateMemberRestaurantRank = async (recommendationId: string, userId: string, rank: string[]) : Promise<boolean> => {
-    return Recommendation.findOneAndUpdate({_id: recommendationId, "members._id": userId}, {"members.$.rank": rank}).then((document) => document ? true : false)
+const updateMemberRestaurantRank = async (recommendationId: string, userId: string, rank: string[]) : Promise<IRecommendation> => {
+    return Recommendation.findOneAndUpdate({_id: recommendationId, "members._id": userId}, {"members.$.rank": rank}, { new: true }).then((document) => {
+        const recommendation = document.toObject() as IRecommendation
+        if (recommendation.members.every((member) => member.rank && member.rank.length > 0)) {
+            // finish recommendation
+            return Recommendation.findByIdAndUpdate(recommendationId, { is_completed: true }, { new: true }).then((document) => document.toObject() as IRecommendation)
+        } else {
+            return recommendation
+        }
+    })
 }
 
 const getById = async (id: string): Promise<IRecommendation> => Recommendation.findById(id).then((document) => document.toObject() as IRecommendation)

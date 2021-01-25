@@ -42,6 +42,11 @@ io.on('connection', function(socket: Socket) {
         io.emit('group-update', id);
     });
 
+    socket.on('group-rank-update', (id: string) => {
+        console.log('new rank update')
+        io.emit('group-rank-update', id);
+    });
+    
     //Whenever someone disconnects this piece of code executed
     socket.on('disconnect', function () {
     //    console.log('A user disconnected')
