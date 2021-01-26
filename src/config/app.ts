@@ -11,8 +11,7 @@ const app = express()
 const http = require('http').Server(app);
 const io = require('socket.io')(http, {
     cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
+        origin: '*',
     }
 });
 
@@ -46,7 +45,7 @@ io.on('connection', function(socket: Socket) {
         console.log('new rank update')
         io.emit('group-rank-update', id);
     });
-    
+
     //Whenever someone disconnects this piece of code executed
     socket.on('disconnect', function () {
     //    console.log('A user disconnected')

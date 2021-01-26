@@ -37,10 +37,12 @@ const initialize = async (members: IMember[], location: [number, number], isGrou
 const request = async (id: string): Promise<IRestaurant[]> => {
     return Recommendation.findById(id).then((document) => {
         const recommendation: IRecommendation = document.toObject() as IRecommendation
-        console.log(recommendation.histories.length)
         return restaurantService.getByDistance({ type: recommendation.type }, recommendation.location.coordinates[1], recommendation.location.coordinates[0], 1000, 100 + recommendation.histories.length).then((restaurants) => {
             const filteredRestaurants = restaurants.filter((restaurant) => !recommendation.histories.map((history) => history.restaurant.toString()).includes(restaurant._id.toString()))
-            console.log(filteredRestaurants.length)
+            console.log(`Available restuarants: ${filteredRestaurants.length}`)
+            if (filteredRestaurants.length < 6) { // TODO: unset hard-coded value
+                throw 'Cannot find more restaurants near you.'
+            }
             const body = {
                 restaurants: filteredRestaurants,
                 users: recommendation.members,
@@ -49,7 +51,7 @@ const request = async (id: string): Promise<IRestaurant[]> => {
                 if (response.status) {
                     return response.data.restaurants as IRestaurant[]
                 } else {
-                    throw('Recommender error!')
+                    throw 'Recommender error!'
                 }
             })
         })

@@ -11,8 +11,8 @@ export interface ErrorResponse extends Response {
     message: string
 }
 
-export const errorResponse = (error: Error): ErrorResponse => {
-    const [code, message] = error.message.includes(':') ? error.message.split(':') : ['unknown', error.message]
+export const errorResponse = (error: any): ErrorResponse => {
+    const [code, message] = error.message?.includes(':') ? error.message.split(':') : error.message ? ['unknown', error.message] : ['unknown', error as string]
     return {
         status: false,
         code,
