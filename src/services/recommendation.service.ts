@@ -38,7 +38,7 @@ const request = async (id: string): Promise<IRestaurant[]> => {
     return Recommendation.findById(id).then((document) => {
         const recommendation: IRecommendation = document.toObject() as IRecommendation
         console.log(recommendation.histories.length)
-        return restaurantService.getByDistance({ type: recommendation.type }, recommendation.location.coordinates[1], recommendation.location.coordinates[0], 2000, 100 + recommendation.histories.length).then((restaurants) => {
+        return restaurantService.getByDistance({ type: recommendation.type }, recommendation.location.coordinates[1], recommendation.location.coordinates[0], 1000, 100 + recommendation.histories.length).then((restaurants) => {
             const filteredRestaurants = restaurants.filter((restaurant) => !recommendation.histories.map((history) => history.restaurant.toString()).includes(restaurant._id.toString()))
             console.log(filteredRestaurants.length)
             const body = {
@@ -90,16 +90,16 @@ const getFinal = async (id: string): Promise<IRestaurant> => {
     return Recommendation.findById(id).then((document) => {
         const recommendation = document.toObject() as IRecommendation
         const getDistance = (restaurant: IRestaurant): number => distance(restaurant.location.coordinates[1], restaurant.location.coordinates[0], recommendation.location.coordinates[1], recommendation.location.coordinates[0])
-        if (recommendation.final_restaurant) {
-            return recommendation.final_restaurant
+        if (recommendation.final_restaurants && recommendation.final_restaurants.length > 0) {
+            return recommendation.final_restaurants[0]
         }
         else if (recommendation.is_group) {
             // TODO: group finalization
             const orderedRestaurantIds = rank(recommendation.members.map((member) => member.rank))
-            const orderedRestaurant = orderedRestaurantIds.map((restaurantId) => recommendation.sugessted_restaurants.find((restaurant) => restaurant._id.toString() === restaurantId))
-            const finalRestaurant = orderedRestaurant[0]
-            Recommendation.findByIdAndUpdate(id, { final_restaurant: finalRestaurant }).exec()
-            return finalRestaurant
+            const orderedRestaurants = orderedRestaurantIds.map((restaurantId) => recommendation.sugessted_restaurants.find((restaurant) => restaurant._id.toString() === restaurantId))
+            console.log(orderedRestaurants)
+            Recommendation.findByIdAndUpdate(id, { $push: { final_restaurants: { $each: orderedRestaurants }}}).exec()
+            return orderedRestaurants[0]
         } else {
             // individual finalization
             const finalRestaurantId = recommendation.histories.find((history) => history.is_love).restaurant as string
@@ -112,7 +112,7 @@ const getFinal = async (id: string): Promise<IRestaurant> => {
                         calculated: distance,
                     }
                 }
-                Recommendation.findByIdAndUpdate(id, { final_restaurant: restaurantWithDistance }).exec()
+                Recommendation.findByIdAndUpdate(id, { $push: { final_restaurants: { $each: [restaurantWithDistance] }}}).exec()
                 return restaurantWithDistance
             })
         }

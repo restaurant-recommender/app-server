@@ -21,7 +21,7 @@ export interface IRecommendation {
     group_pin: string
     type: string
     sugessted_restaurants: IRestaurant[]
-    final_restaurant: IRestaurant
+    final_restaurants: IRestaurant[]
     is_completed: boolean
     is_started: boolean
     is_active: boolean
@@ -73,7 +73,7 @@ const schema = new mongoose.Schema({
     completed_at: Date,
     type: String,
     sugessted_restaurants: [restaurantSchema],
-    final_restaurant: restaurantSchema,
+    final_restaurants: [restaurantSchema],
     group_pin: String,
     is_group: Boolean,
     is_started: {
