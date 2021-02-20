@@ -1,3 +1,4 @@
+import { TransitRoutingPreference } from '@googlemaps/google-maps-services-js'
 import express from 'express'
 import { 
     userController, 
@@ -16,6 +17,8 @@ router.get('/api/_hc', (_, res) => {
         message: 'ok'
     })
 })
+
+router.get('/api/history', recommendationController.getHistory)
 
 router.post('/api/auth/login', authenticationController.login)
 router.post('/api/auth/register', authenticationController.register)

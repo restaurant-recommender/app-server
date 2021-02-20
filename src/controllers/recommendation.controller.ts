@@ -3,7 +3,7 @@ import { Document } from 'mongoose'
 import Restaurant, { IPoint } from '../models/restaurant.model'
 import Recommenation, { IHistory } from '../models/recommendation.model'
 import mongoose from 'mongoose'
-import { recommendationService, restaurantService } from '../services'
+import { historyService, recommendationService, restaurantService } from '../services'
 import { successResponse, errorResponse } from '../utilities/controller'
 
 export interface InitialRequest {
@@ -257,5 +257,13 @@ export const recommendationController = {
         }).catch((error) => {
             res.status(500).send(error)
         })
+    },
+
+    getHistory: (req: Request, res: Response): void => {
+        const userIds = req.body.user_ids
+        const restaurantIds = req.body.restaurant_ids
+        historyService.getUserHistories(restaurantIds, userIds).then((result) => {
+            res.json(result)
+        }).catch((error) => { res.status(500).send(error) })
     }
 }

@@ -9,6 +9,7 @@ export interface IPreference {
 }
 
 export interface IUser {
+    _id: string
     username: string
     password: string
     has_profile: boolean

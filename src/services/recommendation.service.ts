@@ -8,6 +8,7 @@ import env from '../config/environments'
 import { restaurantService } from './restaurant.service'
 import { distance } from '../utilities/function'
 import { rank } from '../utilities/ranking'
+import { historyService } from './history.service'
 
 
 const initialize = async (members: IMember[], location: [number, number], isGroup: boolean, type: string): Promise<IRecommendation> => {
@@ -46,6 +47,7 @@ const request = async (id: string): Promise<IRestaurant[]> => {
             const body = {
                 restaurants: filteredRestaurants,
                 users: recommendation.members,
+                histories: historyService.getUserHistories(filteredRestaurants.map(restaurant => restaurant._id.toString()), recommendation.members.map(member => member._id.toString())),
             }
             return axios.post(`${env.recommenderURL}/recommend/genetic`, body).then((response) => {
                 if (response.status) {
