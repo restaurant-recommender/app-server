@@ -61,6 +61,14 @@ const getById = async (id: string): Promise<Document> => {
 }
 
 const getByQuery = async (query: any): Promise<Document[]> => {
+    if ('categories' in query) {
+        query = {
+            ...query,
+            'profile.categories': { $all: query.categories.map((category: string) => mongoose.Types.ObjectId(category)) }
+        }
+        delete query['categories']
+    }
+    console.log(query)
     return Restaurant.find({
         is_active: true,
         ...query

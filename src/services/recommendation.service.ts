@@ -35,7 +35,7 @@ const initialize = async (members: IMember[], location: [number, number], isGrou
     return recommendation.save().then((document) => document.toObject() as IRecommendation)
 }
 
-const request = async (id: string): Promise<IRestaurant[]> => {
+const request = async (id: string, count: number): Promise<IRestaurant[]> => {
     return Recommendation.findById(id).then((document) => {
         const recommendation: IRecommendation = document.toObject() as IRecommendation
         return restaurantService.getByDistance({ type: recommendation.type }, recommendation.location.coordinates[1], recommendation.location.coordinates[0], 1000, 100 + recommendation.histories.length).then((restaurants) => {
@@ -49,7 +49,7 @@ const request = async (id: string): Promise<IRestaurant[]> => {
                 users: recommendation.members,
                 histories: historyService.getUserHistories(filteredRestaurants.map(restaurant => restaurant._id.toString()), recommendation.members.map(member => member._id.toString())),
             }
-            return axios.post(`${env.recommenderURL}/recommend/genetic`, body).then((response) => {
+            return axios.post(`${env.recommenderURL}/recommend/genetic?count=${count}`, body).then((response) => {
                 if (response.status) {
                     return response.data.restaurants as IRestaurant[]
                 } else {

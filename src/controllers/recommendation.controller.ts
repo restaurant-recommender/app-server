@@ -103,7 +103,8 @@ export const recommendationController = {
     },
 
     request: (req: Request, res: Response): void => {
-        recommendationService.request(req.params.id).then((restaurants) => {
+        const count = parseInt(req.query.count as string) ?? 6
+        recommendationService.request(req.params.id, count).then((restaurants) => {
             res.json(successResponse(restaurants))
         }).catch((error) => { res.json(errorResponse(error))})
     },
