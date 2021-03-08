@@ -2,6 +2,7 @@ import Restaurant, { IRestaurant } from '../models/restaurant.model'
 import mongoose, { Document } from 'mongoose'
 import { getDuplicateRestaurant, getDetailedRestaurant } from '../utilities/restaurant'
 import { googleMapsService } from './googleMaps.service'
+import { pictureService } from './picture.service'
 
 
 const create = async (restaurant: IRestaurant): Promise<Document | void | any> => {
@@ -113,7 +114,10 @@ const getByDistance = async (query: any, latitude: number, longitude: number, ma
             ...optionQuerys,
             { $lookup: { from: 'categories', localField: 'profile.categories', foreignField: '_id', as: 'profile.categories' } },
         ]).then((documents) => {
-            return documents.map((document) => document as IRestaurant)
+            return documents.map((document) => document as IRestaurant).map((restaurant) => ({
+                ...restaurant,
+                cover_url: pictureService.getPictureUrl(restaurant),
+            }))
         })
     } catch (error) {
         throw (error)
