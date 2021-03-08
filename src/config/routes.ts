@@ -6,7 +6,8 @@ import {
     categoryController,
     reportController,
     recommendationController, 
-    authenticationController 
+    authenticationController, 
+    favoriteController
 } from '../controllers'
 import { auth } from '../utilities/authentication'
 
@@ -25,6 +26,9 @@ router.post('/api/auth/register', authenticationController.register)
 
 router.post('/api/users/:id/preferences', userController.updatePreferences)
 router.get('/api/users/:id/preferences', userController.getPreferences)
+router.get('/api/users/:userid/favorites', favoriteController.getUserFavorite)
+router.get('/api/users/:userid/favorites/add/:restaurantid', favoriteController.addUserFavorite)
+router.get('/api/users/:userid/favorites/remove/:restaurantid', favoriteController.removeUserFavorite)
 
 router.get('/api/categories/common', categoryController.getCommonCategories)
 
@@ -68,5 +72,8 @@ router.post('/api/v0/recommendations/request', recommendationController.requestR
 
 router.get('/api/reports', reportController.getByQuery)
 router.post('/api/reports', reportController.create)
+
+router.get('/api/favorites', favoriteController.getAll)
+router.post('/api/favorites', favoriteController.create)
 
 export default router
