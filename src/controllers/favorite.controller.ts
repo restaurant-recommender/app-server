@@ -37,21 +37,27 @@ export const favoriteController = {
         })
     },
 
-    getUserFavorite:  (req: Request, res: Response): void => {
+    getUserFavorite: (req: Request, res: Response): void => {
         favoriteService.getFavoriteRestaurantsByUserId(req.params.userid as string).then((restaurants) => {
             res.json(successResponse(restaurants))
         }).catch(err => { res.json(errorResponse(err)) })
     },
 
-    addUserFavorite:  (req: Request, res: Response): void => {
+    addUserFavorite: (req: Request, res: Response): void => {
         favoriteService.addFaveoriteRestaurant(req.params.userid as string, req.params.restaurantid as string).then(_ => {
             res.json(successResponse(null))
         }).catch(err => { res.json(errorResponse(err)) })
     },
 
-    removeUserFavorite:  (req: Request, res: Response): void => {
+    removeUserFavorite: (req: Request, res: Response): void => {
         favoriteService.removeFaveoriteRestaurant(req.params.userid as string, req.params.restaurantid as string).then(_ => {
             res.json(successResponse(null))
+        }).catch(err => { res.json(errorResponse(err)) })
+    },
+
+    hasRestaurant: (req: Request, res: Response): void => {
+        favoriteService.hasFavoriteRestaurant(req.params.userid as string, req.params.restaurantid as string).then(result => {
+            res.json(successResponse(result))
         }).catch(err => { res.json(errorResponse(err)) })
     },
 }

@@ -29,6 +29,7 @@ router.get('/api/users/:id/preferences', userController.getPreferences)
 router.get('/api/users/:userid/favorites', favoriteController.getUserFavorite)
 router.get('/api/users/:userid/favorites/add/:restaurantid', favoriteController.addUserFavorite)
 router.get('/api/users/:userid/favorites/remove/:restaurantid', favoriteController.removeUserFavorite)
+router.get('/api/users/:userid/favorites/check/:restaurantid', favoriteController.hasRestaurant)
 
 router.get('/api/categories/common', categoryController.getCommonCategories)
 

@@ -45,8 +45,18 @@ const removeFaveoriteRestaurant = async (userId: string, restaurantId: string): 
     ).exec()
 }
 
+const hasFavoriteRestaurant = async (userId: string, restaurantId: string): Promise<boolean> => {
+    return Favorite.findOne({ 
+        user: mongoose.Types.ObjectId(userId),
+        restaurants: mongoose.Types.ObjectId(restaurantId),
+    }).then((favorite) => {
+        return favorite ? true : false
+    })
+}
+
 export const favoriteService = {
     getFavoriteRestaurantsByUserId,
     addFaveoriteRestaurant,
     removeFaveoriteRestaurant,
+    hasFavoriteRestaurant,
 }
