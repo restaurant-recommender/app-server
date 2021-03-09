@@ -28,14 +28,30 @@ const getFavoriteRestaurantsByUserId = async (id: string): Promise<IRestaurant[]
 }
 
 const addFaveoriteRestaurant = async (userId: string, restaurantId: string): Promise<void> => {
-    Favorite.findOneAndUpdate(
-        { 
-            user: mongoose.Types.ObjectId(userId),
-            restaurants: { $ne: mongoose.Types.ObjectId(restaurantId) },
-        },
-        { $push: { restaurants: mongoose.Types.ObjectId(restaurantId) } },
-        { upsert: true },
-    ).exec()
+    return Favorite.findOne({ 
+        user: mongoose.Types.ObjectId(userId),
+    }).then((favorite) => {
+        if (favorite) {
+            Favorite.findOneAndUpdate(
+                { 
+                    user: mongoose.Types.ObjectId(userId),
+                    restaurants: { $ne: mongoose.Types.ObjectId(restaurantId) },
+                },
+                { $push: { restaurants: mongoose.Types.ObjectId(restaurantId) } },
+                { upsert: true },
+            ).exec().then(_ => {
+                return
+            })
+        } else {
+            const newFavorite = new Favorite({
+                user: mongoose.Types.ObjectId(userId),
+                restaurants: [mongoose.Types.ObjectId(restaurantId)],
+            })
+            newFavorite.save().then(_ => {
+                return
+            })
+        }
+    })
 }
 
 const removeFaveoriteRestaurant = async (userId: string, restaurantId: string): Promise<void> => {
