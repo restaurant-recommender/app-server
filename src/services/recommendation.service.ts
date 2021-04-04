@@ -78,6 +78,16 @@ const complete = async (id: string): Promise<boolean> => {
 
 const joinGroup = async (pin:string, member: IMember): Promise<IRecommendation> => {
     return Recommendation.findOne({ group_pin: pin, is_started: false }).then((document) => {
+        console.log(document)
+        if (!document) {
+            console.log('not found')
+            // find recommendation that user existed
+            return Recommendation.findOne({ group_pin: pin, 'members._id': mongoose.Types.ObjectId(member._id), is_completed: false }).then((document) => {
+                console.log('existed')
+                console.log(document)
+                return document.toObject() as IRecommendation
+            })
+        }
         const recommendation = document.toObject() as IRecommendation
         if (recommendation.members.map((member) => member._id.toString()).includes(member._id.toString())) {
             // user already joined
