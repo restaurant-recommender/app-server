@@ -41,19 +41,21 @@ const defaultPicture: any = {
 }
 
 const getPictureUrl = (restaurant: IRestaurant) => {
-    if (restaurant.cover_url) {
-        return restaurant.cover_url
-    } else {
-        let defaultPictureUrl: string = defaultPicture.default[0]
-        for (let i = 0; i < restaurant.profile.categories.length; i++) {
-            const categoryName = (restaurant.profile.categories[i] as ICategory).name_en
-            if (categoryName in defaultPicture) {
-                defaultPictureUrl = defaultPicture[categoryName][0]
-                break
-            }
-        }
-        return defaultPictureUrl
-    }
+    console.log(restaurant.cover_url)
+    return restaurant.cover_url
+    // if (restaurant.cover_url) {
+    //     return restaurant.cover_url
+    // } else {
+    //     let defaultPictureUrl: string = defaultPicture.default[0]
+    //     for (let i = 0; i < restaurant.profile.categories.length; i++) {
+    //         const categoryName = (restaurant.profile.categories[i] as ICategory).name_en
+    //         if (categoryName in defaultPicture) {
+    //             defaultPictureUrl = defaultPicture[categoryName][0]
+    //             break
+    //         }
+    //     }
+    //     return defaultPictureUrl
+    // }
 }
 
 export const pictureService = {
