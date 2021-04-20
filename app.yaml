@@ -1,0 +1,29 @@
+# Flex
+# runtime: nodejs
+# env: flex
+
+# Normal
+runtime: nodejs12
+
+instance_class: F1
+service: neutron
+
+env_variables:
+    MONGODB_URL: mongodb+srv://guest:guest@rescluster.2qkym.mongodb.net/restaurant?retryWrites=true&w=majority
+    RECOMMENDER_URL: https://proton-dot-restaurant-recommender-system.et.r.appspot.com
+    GOOGLE_MAPS_API_KEY: AIzaSyCIkrWcXiOPTQpsDdDEFAvesfWfFO_P6nA
+    NEARBY_FETCH_ENABLED: TRUE
+    APP_SECRET: v8-5-eWC9RxC2PNB_HSJXxPf9Nv3cMHBHhxSUIUX7HPQQNU650du1JU3ujLygbCs24y4TgdcL6OhDhXcDzDa5g
+
+# automatic_scaling:
+#   min_num_instances: 1
+#   max_num_instances: 2
+
+handlers:
+  - url: /.*
+    secure: always
+    redirect_http_response_code: 301
+    script: auto
+
+network:
+  session_affinity: true
