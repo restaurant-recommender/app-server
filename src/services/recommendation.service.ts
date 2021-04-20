@@ -108,11 +108,13 @@ const getFinal = async (id: string): Promise<IRestaurant> => {
             return recommendation.final_restaurants[0]
         }
         else if (recommendation.is_group) {
-            // TODO: group finalization
+            // group finalization
             const orderedRestaurantIds = rank(recommendation.members.map((member) => member.rank))
             const orderedRestaurants = orderedRestaurantIds.map((restaurantId) => recommendation.sugessted_restaurants.find((restaurant) => restaurant._id.toString() === restaurantId))
             console.log(orderedRestaurants)
-            Recommendation.findByIdAndUpdate(id, { $push: { final_restaurants: { $each: orderedRestaurants }}}).exec()
+            if (recommendation.final_restaurants.length == 0) {
+                Recommendation.findByIdAndUpdate(id, { $push: { final_restaurants: { $each: orderedRestaurants }}}).exec()
+            }
             return orderedRestaurants[0]
         } else {
             // individual finalization
