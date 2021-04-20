@@ -7,7 +7,8 @@ import {
     reportController,
     recommendationController, 
     authenticationController, 
-    favoriteController
+    favoriteController,
+    activityController
 } from '../controllers'
 import { auth } from '../utilities/authentication'
 
@@ -45,6 +46,9 @@ router.post('/api/recommendations/:id/members/:userid/rank', recommendationContr
 router.post('/api/recommendations/:id', recommendationController.update)
 
 router.post('/api/group/:pin/join', recommendationController.joinGroup)
+
+router.get('/api/tracks', activityController.getByQuery)
+router.post('/api/tracks', activityController.create)
 
 // Common --------------------------------------------
 
