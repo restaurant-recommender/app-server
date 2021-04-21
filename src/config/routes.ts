@@ -48,6 +48,7 @@ router.post('/api/recommendations/:id', recommendationController.update)
 router.post('/api/group/:pin/join', recommendationController.joinGroup)
 
 router.get('/api/tracks', activityController.getByQuery)
+router.post('/api/tracks/query', activityController.getByQuery)
 router.post('/api/tracks', activityController.create)
 
 // Common --------------------------------------------
