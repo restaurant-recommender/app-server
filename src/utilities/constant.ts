@@ -36,4 +36,7 @@ export const ActivityEvent = {
     INDIVIDUAL_END: 502,
     GROUP_START: 503,
     GROUP_END: 504,
+
+    // MISC
+    WANT_TO_USE_AGAIN: 1001,
 }
