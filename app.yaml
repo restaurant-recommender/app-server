@@ -1,9 +1,9 @@
 # Flex
-# runtime: nodejs
-# env: flex
+runtime: nodejs
+env: flex
 
 # Normal
-runtime: nodejs12
+# runtime: nodejs12
 
 instance_class: F1
 service: neutron
@@ -15,9 +15,9 @@ env_variables:
     NEARBY_FETCH_ENABLED: TRUE
     APP_SECRET: v8-5-eWC9RxC2PNB_HSJXxPf9Nv3cMHBHhxSUIUX7HPQQNU650du1JU3ujLygbCs24y4TgdcL6OhDhXcDzDa5g
 
-# automatic_scaling:
-#   min_num_instances: 1
-#   max_num_instances: 2
+automatic_scaling:
+  min_num_instances: 1
+  max_num_instances: 1
 
 handlers:
   - url: /.*
