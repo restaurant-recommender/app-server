@@ -1,6 +1,16 @@
 import mongoose from 'mongoose'
 import { ICategory } from './category.model'
 
+export interface IScore {
+    pref_score?: number
+    rank_score?: number
+    price_score?: number
+    norm_pref_score?: number
+    norm_rank_score?: number
+    norm_price_score?: number
+    sum_score?: number
+}
+
 export interface IRestaurant {
     _id?: string
     name: string
@@ -26,6 +36,7 @@ export interface IRestaurant {
     dist?: {
         calculated: number
     }
+    score?: IScore
 }
 
 export interface IPoint {
@@ -72,6 +83,7 @@ const schema = new mongoose.Schema({
     ref: String,
     ref_id: String,
     link: String,
+    score: mongoose.Schema.Types.Mixed,
     dist: {
         type: {
             calculated: Number

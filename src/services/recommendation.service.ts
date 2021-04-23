@@ -7,7 +7,7 @@ import axios from 'axios'
 import env from '../config/environments'
 import { restaurantService } from './restaurant.service'
 import { distance } from '../utilities/function'
-import { rank } from '../utilities/ranking'
+import { arregateRank, rank } from '../utilities/ranking'
 import { historyService } from './history.service'
 
 
@@ -38,7 +38,7 @@ const initialize = async (members: IMember[], location: [number, number], isGrou
 const request = async (id: string, count: number): Promise<IRestaurant[]> => {
     return Recommendation.findById(id).then((document) => {
         const recommendation: IRecommendation = document.toObject() as IRecommendation
-        return restaurantService.getByDistance({ type: recommendation.type }, recommendation.location.coordinates[1], recommendation.location.coordinates[0], 1000, 100 + recommendation.histories.length).then((restaurants) => {
+        return restaurantService.getByDistance({ type: recommendation.type }, recommendation.location.coordinates[1], recommendation.location.coordinates[0], 3000, 100 + recommendation.histories.length).then((restaurants) => {
             const filteredRestaurants = restaurants.filter((restaurant) => !recommendation.histories.map((history) => history.restaurant.toString()).includes(restaurant._id.toString()))
             console.log(`Available restuarants: ${filteredRestaurants.length}`)
             if (filteredRestaurants.length < 6) { // TODO: unset hard-coded value
@@ -105,17 +105,14 @@ const getFinal = async (id: string): Promise<IRestaurant> => {
         const recommendation = document.toObject() as IRecommendation
         const getDistance = (restaurant: IRestaurant): number => distance(restaurant.location.coordinates[1], restaurant.location.coordinates[0], recommendation.location.coordinates[1], recommendation.location.coordinates[0])
         if (recommendation.final_restaurants && recommendation.final_restaurants.length > 0) {
+            console.log('get existing final')
             return recommendation.final_restaurants[0]
         }
         else if (recommendation.is_group) {
             // group finalization
-            const orderedRestaurantIds = rank(recommendation.members.map((member) => member.rank))
-            const orderedRestaurants = orderedRestaurantIds.map((restaurantId) => recommendation.sugessted_restaurants.find((restaurant) => restaurant._id.toString() === restaurantId))
-            console.log(orderedRestaurants)
-            if (recommendation.final_restaurants.length == 0) {
-                Recommendation.findByIdAndUpdate(id, { $push: { final_restaurants: { $each: orderedRestaurants }}}).exec()
-            }
-            return orderedRestaurants[0]
+            console.log('generateing new final')
+            const orderedRestaurants = arregateRank(recommendation)
+            return Recommendation.findByIdAndUpdate(id, { final_restaurants: orderedRestaurants }).then(_ => orderedRestaurants[0])
         } else {
             // individual finalization
             const finalRestaurantId = recommendation.histories.find((history) => history.is_love).restaurant as string
