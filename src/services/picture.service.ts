@@ -41,7 +41,6 @@ const defaultPicture: any = {
 }
 
 const getPictureUrl = (restaurant: IRestaurant) => {
-    console.log(restaurant.cover_url)
     return restaurant.cover_url
     // if (restaurant.cover_url) {
     //     return restaurant.cover_url
