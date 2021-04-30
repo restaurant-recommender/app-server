@@ -4,7 +4,6 @@ import mongoose from 'mongoose'
 import cors from 'cors'
 import router from './routes'
 import env from './environments'
-import { Socket } from 'dgram'
 
 const app = express()
 
@@ -29,27 +28,36 @@ mongoose.connect(env.mongoURL, {
 })
 mongoose.set('useCreateIndex', true)
 
-// routes
-app.use('/', router)
-
 // socket io
-io.on('connection', function(socket: Socket) {
-    // console.log('A user connected');
+io.on('connection', (socket: any) => {
+    console.log('user connected');
+
+    socket.on('group-join', (id: string) => {
+        console.log('join group: ' + id)
+        socket.join(id)
+    })
 
     socket.on('group-update', (id: string) => {
-        console.log('new update')
-        io.emit('group-update', id);
+        console.log('new update: ' + id)
+        io.to(id).emit('group-update');
+    });
+
+    socket.on('group-rank-join', (id: string) => {
+        console.log('join group rank: ' + id)
+        socket.join(id)
     });
 
     socket.on('group-rank-update', (id: string) => {
         console.log('new rank update')
-        io.emit('group-rank-update', id);
+        io.to(id).emit('group-rank-update');
     });
 
-    //Whenever someone disconnects this piece of code executed
     socket.on('disconnect', function () {
-    //    console.log('A user disconnected')
+       console.log('user leave')
     })
 })
+
+// routes
+app.use('/', router)
 
 export default http
