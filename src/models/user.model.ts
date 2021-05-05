@@ -27,6 +27,7 @@ export interface IUser {
             prefer_nearby: boolean
         }
     }
+    track: any
     recommendation_histories: string[] | IRecommendation[]
     is_active: boolean
 }
@@ -64,6 +65,7 @@ const schema = new mongoose.Schema({
             },
         }
     },
+    track: mongoose.Schema.Types.Mixed,
     recommendation_histories: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'recommendations',

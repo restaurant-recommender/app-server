@@ -51,6 +51,47 @@ export const userController = {
         })
     },
 
+    getTrack: (req: Request, res: Response): void => {
+        User.findById(req.params.id, (err: any, user: Document) => {
+            if (err) {
+                res.send(err)
+            }
+            res.json(user.toObject().track || {})
+        })
+    },
+
+    getTrackOfEvent: (req: Request, res: Response): void => {
+        User.findById(req.params.id, (err: any, user: Document) => {
+            if (err) {
+                res.send(err)
+            }
+            const userTrack = user.toObject().track || {}
+            if (!(req.params.event in userTrack)) {
+                res.json(false)
+            } else if (userTrack[req.params.event] === false) {
+                res.json(false)
+            } else {
+                res.json(true)
+            }
+        })
+    },
+
+    updateTrack: (req: Request, res: Response): void => {
+        User.findById(req.params.id, (err: any, user: Document) => {
+            if (err) {
+                res.send(err)
+            }
+            let userTrack = user.toObject().track || {}
+            userTrack[req.params.event] = true
+            User.findByIdAndUpdate(req.params.id, { track: userTrack }, (err: any, user: Document) => {
+                if (err) {
+                    res.send(err)
+                }
+                res.json(user.toObject().track || {})
+            })
+        })
+    },
+
     create: (req: Request, res: Response): void => {
         userService.create(req.body).then((user) => {
             res.json(user)
